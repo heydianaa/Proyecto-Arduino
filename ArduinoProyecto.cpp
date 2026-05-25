@@ -1,29 +1,32 @@
 #include <Servo.h>
 Servo miServo;
 
-const int boton1 = 2; 
-const int boton2 = 16;
+// PINES 
+
+// Botones
+const int boton1 = 2;
+const int boton2 = 3;
 
 // Display
 const int a = 4;
 const int b = 5;
-const int c = 17;
-const int d = 18;
-const int e = 15;
+const int c = A3;
+const int d = A4;
+const int e = A5;
 const int f = 6;
 const int g = 7;
 
 // Componentes
-const int potenciometro = A5;
 const int buzzer = 8;
-const int servo = 3;
-
-// RGB
 const int rojo = 9;
 const int verde = 10;
 const int azul = 11;
+const int servo = 12;
 
-//variables
+// Potenciómetro
+const int potenciometro = A7;
+
+// VARIABLES 
 
 int modo = 0;
 
@@ -55,13 +58,15 @@ void setup() {
   pinMode(azul, OUTPUT);
 
   miServo.attach(servo);
+
   miServo.write(0);
 }
 
 void loop() {
 
-  // boton modo
-
+  
+  // BOTON CAMBIO MODO
+  
   estadoBoton1 = digitalRead(boton1);
 
   if (estadoBoton1 == HIGH && ultimoEstadoBoton1 == LOW) {
@@ -74,25 +79,30 @@ void loop() {
 
     alarmaSilenciada = 0;
 
-    delay(50);
+    delay(60);
   }
 
   ultimoEstadoBoton1 = estadoBoton1;
 
-  //modo 0
+ 
+  // MODO 0
+ 
 
   if (modo == 0) {
 
     mostrar0();
 
-    setColor(0, 0, 0);
+    setColor(LOW, LOW, LOW);
 
     digitalWrite(buzzer, LOW);
 
     miServo.write(0);
+
+    delay(20);
   }
 
-  //modo 1
+  // MODO 1
+ 
 
   else if (modo == 1) {
 
@@ -102,45 +112,55 @@ void loop() {
 
     int lpm = map(lectura, 0, 1023, 0, 200);
 
-    int angulo = map(lpm, 0, 200, 0, 180);
+    
+    int angulo = map(lectura, 0, 1023, 0, 180);
 
     miServo.write(angulo);
 
+    delay(15);
+
     digitalWrite(buzzer, LOW);
 
-    // Bradicardia
+    // BRADICARDIA
     if (lpm < 60) {
 
-      // Amarillo
-      setColor(255, 255, 0);
+      // amarillo
+      setColor(HIGH, HIGH, LOW);
     }
 
-    // Normal
+    // NORMAL
     else if (lpm <= 100) {
 
-      // Verde
-      setColor(0, 255, 0);
+      // verde
+      setColor(LOW, HIGH, LOW);
     }
 
-    // Taquicardia
+    // TAQUICARDIA
     else if (lpm <= 150) {
 
-      // Rojo
-      setColor(255, 0, 0);
+      // rojo
+      setColor(HIGH, LOW, LOW);
     }
 
-    // Taquicardia severa
+    // TAQUICARDIA SEVERA
     else {
 
-      setColor(255, 0, 0);
-      delay(200);
+      // rojo parpadeando rapido
+      setColor(HIGH, LOW, LOW);
 
-      setColor(0, 0, 0);
-      delay(200);
+      delay(25);
+
+      setColor(LOW, LOW, LOW);
+
+      delay(25);
     }
+
+    delay(20);
   }
 
-  //modo 2
+ 
+  // MODO 2
+
 
   else if (modo == 2) {
 
@@ -150,7 +170,9 @@ void loop() {
 
     int temperatura = map(lectura, 0, 1023, 20, 45);
 
-    // alarma
+    
+    // BOTON ALARMA
+   
 
     estadoBoton2 = digitalRead(boton2);
 
@@ -160,16 +182,16 @@ void loop() {
 
       digitalWrite(buzzer, LOW);
 
-      delay(50);
+      delay(60);
     }
 
     ultimoEstadoBoton2 = estadoBoton2;
 
-    // Hipotermia
+    // HIPOTERMIA
     if (temperatura < 35) {
 
-      // Morado
-      setColor(255, 0, 255);
+      // morado
+      setColor(HIGH, LOW, HIGH);
 
       miServo.write(0);
 
@@ -178,11 +200,11 @@ void loop() {
       }
     }
 
-    // Normal
+    // NORMAL
     else if (temperatura <= 37) {
 
-      // Cyan
-      setColor(0, 255, 255);
+      // cyan
+      setColor(LOW, HIGH, HIGH);
 
       miServo.write(45);
 
@@ -191,11 +213,11 @@ void loop() {
       alarmaSilenciada = 0;
     }
 
-    // Febricula
+    // FEBRICULA
     else if (temperatura <= 38) {
 
-      // Amarillo
-      setColor(255, 255, 0);
+      // amarillo
+      setColor(HIGH, HIGH, LOW);
 
       miServo.write(90);
 
@@ -204,11 +226,11 @@ void loop() {
       alarmaSilenciada = 0;
     }
 
-    // Fiebre
+    // FIEBRE
     else if (temperatura <= 39) {
 
-      // Naranja
-      setColor(255, 120, 0);
+      // rojo
+      setColor(HIGH, LOW, LOW);
 
       miServo.write(135);
 
@@ -217,11 +239,11 @@ void loop() {
       alarmaSilenciada = 0;
     }
 
-    // Fiebre alta
+    // FIEBRE ALTA
     else {
 
-      // Blanco
-      setColor(255, 255, 255);
+      // blanco
+      setColor(HIGH, HIGH, HIGH);
 
       miServo.write(180);
 
@@ -229,19 +251,25 @@ void loop() {
         digitalWrite(buzzer, HIGH);
       }
     }
+
+    delay(20);
   }
 }
 
-//LED RGB
 
-void setColor(int red, int green, int blue) {
+// FUNCION RGB
 
-  analogWrite(rojo, red);
-  analogWrite(verde, green);
-  analogWrite(azul, blue);
+
+void setColor(int r, int v, int aColor) {
+
+  digitalWrite(rojo, r);
+  digitalWrite(verde, v);
+  digitalWrite(azul, aColor);
 }
 
-//#0
+
+// DISPLAY 0
+
 
 void mostrar0() {
 
@@ -254,7 +282,9 @@ void mostrar0() {
   digitalWrite(g, LOW);
 }
 
-//#1
+
+// DISPLAY 1
+
 
 void mostrar1() {
 
@@ -267,7 +297,8 @@ void mostrar1() {
   digitalWrite(g, LOW);
 }
 
-//#2
+
+// DISPLAY 2
 
 void mostrar2() {
 
