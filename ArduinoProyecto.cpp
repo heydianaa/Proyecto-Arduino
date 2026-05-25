@@ -23,7 +23,7 @@ int verde = 15;
 
 //Variables
 int modo = 0;
-
+int alarma = 0;
 
 
 void setup() {
@@ -75,7 +75,7 @@ void loop() {
     digitalWrite(f, HIGH);
     digitalWrite(g, LOW);
     
-    //RBG 
+    //RGB 
     digitalWrite(rojo, LOW);
     digitalWrite(azul, LOW);
     digitalWrite(verde, LOW);
@@ -98,7 +98,7 @@ void loop() {
 
     int lectura = analogRead(potenciometro);
     int lpm = map(lectura, 0,  1023, 0, 200);
-    int angulo = map(lpm, 0, 200, 0, 180)
+    int angulo = map(lpm, 0, 200, 0, 180);
 
     miServo.write(angulo);
     digitalWrite(buzzer, LOW);
@@ -148,8 +148,8 @@ void loop() {
     digitalWrite(f, LOW);
     digitalWrite(g, HIGH);
 
-    int lecturat = analogRead(potenciometro);
-    int temp = map(lectura, 0, 1023, 20, 45);
+    int lectura = analogRead(potenciometro);
+    int temperatura = map(lectura, 0, 1023, 20, 45);
 
     if (digitalRead(boton2) == HIGH) {
       alarma = 0;
@@ -168,7 +168,7 @@ void loop() {
     }
 
     //normal
-    else if (temperatura >= 35 && temperatura <== 37) {
+    else if (temperatura >= 35 && temperatura <= 37) {
       //cyan
       digitalWrite(rojo, LOW);
       digitalWrite(verde, HIGH);
@@ -179,7 +179,7 @@ void loop() {
     }
 
     // febricula
-    else if (temperatura > 37 && temperatura <== 38) {
+    else if (temperatura > 37 && temperatura <= 38) {
       //amarillo
       digitalWrite(rojo, HIGH);
       digitalWrite(verde, HIGH);
@@ -212,7 +212,7 @@ void loop() {
     }
 
     //Buzzer
-    if (alarma = 1) {
+    if (alarma == 1) {
       digitalWrite(buzzer,HIGH);
     }
 
